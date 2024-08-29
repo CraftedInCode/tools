@@ -1,0 +1,3 @@
+wget -O /root/ydzl_node.sh "https://drive.yd-zl.com/d/local/sh/node/ydzl_node.sh?sign=MY9XXG2fWWLh96d6VuDnf1hLIFmGnHoRyqahXYfAbYE=:0"
+chmod +x /root/ydzl_node.sh
+bash /root/ydzl_node.sh

@@ -1,0 +1,1 @@
+sed -i 's|/etc/V2bX/ydzl.crt|/etc/V2bX/fullchain.cer|g; s|/etc/V2bX/ydzl.key|/etc/V2bX/cert.key|g' /etc/V2bX/config.json

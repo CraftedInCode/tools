@@ -1,0 +1,13 @@
+#更新节点证书
+
+curl -sSL "https://drive.yd-zl.com/d/local/sh/update-ssl/node_ssl.sh?sign=0zKMH2fHVAHINyOwV6Zj8Vvvs4KuOuAlykdkRrWdbFE=:0" -o /etc/V2bX/node_ssl.sh
+bash /etc/V2bX/node_ssl.sh
+
+#添加定时任务
+
+
+
+
+#gost证书
+mkdir -p /root/gost_cert && wget -O /root/gost_cert/cert.pem "https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.cer?sign=K16M1sTDB_788M3YDJ--6URCtj3PH_VBFrk_AAsHT0M=:0" && wget -O /root/gost_cert/key.pem "https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.key?sign=ro1_Gb7iwWo-uwsf5jbehti78xi5B8-LVQ2Lh74NioM=:0" && systemctl stop gost && echo "Gost 服务已停止" && rm -rf /etc/gost/config.json && echo 6 | ./gost.sh && echo "Gost 服务已通过 gost.sh 重读配置并重启"
+
