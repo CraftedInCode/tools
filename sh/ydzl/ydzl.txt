@@ -1,1 +1,1 @@
-wget -O ydzl.sh https://raw.githubusercontent.com/yunduanzhilian7/tools/main/sh/ydzl/ydzl.sh && chmod 777 ydzl.sh && ./ydzl.sh
+wget -O ydzl.sh https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/ydzl/ydzl.sh && chmod 777 ydzl.sh && ./ydzl.sh
