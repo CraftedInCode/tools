@@ -221,7 +221,8 @@ function generate_sing_origin_json() {
           "hongkongtrader",
           "yd-zl",
           "云端智联",
-          "yunduanzhilian"
+          "yunduanzhilian",
+          "yunduanconnect"
         ],
         "outbound": "direct"
       },
@@ -309,8 +310,8 @@ EOF
 
 function download_ssl() {
     # Step 5: 下载 SSL 证书和密钥
-    CERT_URL="https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.cer?sign=K16M1sTDB_788M3YDJ--6URCtj3PH_VBFrk_AAsHT0M=:0"
-    KEY_URL="https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.key?sign=ro1_Gb7iwWo-uwsf5jbehti78xi5B8-LVQ2Lh74NioM=:0"
+    CERT_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/yunduanconnect.cer"
+    KEY_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/yunduanconnect.key"
     DEST_DIR="/etc/V2bX"
     CERT_FILE="$DEST_DIR/fullchain.cer"
     KEY_FILE="$DEST_DIR/cert.key"
@@ -379,101 +380,6 @@ function restart_V2bX_service() {
     fi
 }
 
-#安装gost/生成配置+证书
-function install_and_configure_gost() {
-    echo -e "${GREEN}正在下载并安装 gost...${NC}"
-
-    # 下载 gost 安装脚本
-    wget --no-check-certificate -O gost.sh https://raw.githubusercontent.com/KANIKIG/Multi-EasyGost/master/gost.sh
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}下载 gost 安装脚本失败！${NC}" >&2
-        exit 1
-    fi
-
-    # 修改权限并执行安装脚本
-    chmod +x gost.sh
-    ./gost.sh
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}gost 安装失败！${NC}" >&2
-        exit 1
-    fi
-
-    # 自动选择 1 和 n
-    echo -e "1\nn" | ./gost.sh
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}gost 配置失败！${NC}" >&2
-        exit 1
-    fi
-
-    echo -e "${GREEN}gost 安装和配置成功。${NC}"
-
-    # 安装完成后生成配置文件
-    echo -e "${GREEN}请输入端口号（例如：11111）：${NC}"
-    read -r port
-
-    echo -e "${GREEN}请输入节点域名前缀（例如：us1）：${NC}"
-    read -r node_prefix
-
-    # 生成 config.json
-    config_json_content=$(cat <<EOF
-{
-    "Debug": true,
-    "Retries": 0,
-    "ServeNodes": [
-        "relay+wss://:${port}/${node_prefix}.ccjz4nmym6qedf3muvprkn6e73rgad3ks3uj1nuocfpn46vyquh2zj070b3uf12.yunduanconnect.com:8443?cert=/root/gost_cert/cert.pem&key=/root/gost_cert/key.pem"
-    ]
-}
-EOF
-    )
-
-    echo -e "${GREEN}正在生成 /etc/gost/config.json...${NC}"
-    echo "$config_json_content" | sudo tee /etc/gost/config.json > /dev/null
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}生成 /etc/gost/config.json 文件失败！${NC}" >&2
-        exit 1
-    fi
-
-    echo -e "${GREEN}/etc/gost/config.json 文件生成成功。${NC}"
-
-    # 生成 rawconf
-    rawconf_content=$(cat <<EOF
-decryptwss/${port}#${node_prefix}.ccjz4nmym6qedf3muvprkn6e73rgad3ks3uj1nuocfpn46vyquh2zj070b3uf12.yunduanconnect.com#8443
-EOF
-    )
-
-    echo -e "${GREEN}正在生成 /etc/gost/rawconf...${NC}"
-    echo "$rawconf_content" | sudo tee /etc/gost/rawconf > /dev/null
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}生成 /etc/gost/rawconf 文件失败！${NC}" >&2
-        exit 1
-    fi
-
-    echo -e "${GREEN}/etc/gost/rawconf 文件生成成功。${NC}"
-
-    # 生成证书目录并下载证书和密钥
-    echo -e "${GREEN}正在生成证书目录并下载证书和密钥...${NC}"
-    sudo mkdir -p /root/gost_cert
-    wget -O /root/gost_cert/cert.pem "https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.cer?sign=K16M1sTDB_788M3YDJ--6URCtj3PH_VBFrk_AAsHT0M=:0"
-    wget -O /root/gost_cert/key.pem "https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.key?sign=ro1_Gb7iwWo-uwsf5jbehti78xi5B8-LVQ2Lh74NioM=:0"
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}证书或密钥下载失败！${NC}" >&2
-        exit 1
-    fi
-
-    # 停止 gost 服务并重读配置
-    echo -e "${GREEN}正在停止 gost 服务...${NC}"
-    sudo systemctl stop gost
-    echo "Gost 服务已停止"
-
-    echo -e "${GREEN}正在删除旧的配置文件...${NC}"
-    sudo rm -rf /etc/gost/config.json
-
-    echo -e "${GREEN}正在重读配置并重启 gost 服务...${NC}"
-    echo 6 | ./gost.sh
-    echo "Gost 服务已通过 gost.sh 重读配置并重启"
-    echo -e "${GREEN}继续下一步${NC}"
-}
-
 # Step 8: 安装并启用 BBR
 function install_and_enable_bbr() {
     echo "正在安装证书工具和下载 BBR 脚本..."
@@ -484,18 +390,6 @@ function install_and_enable_bbr() {
     ./tcpx.sh
 
     echo -e "${GREEN}BBR 已配置完成。${NC}"
-}
-
-# Step 9: 再次重启 V2bX 服务
-function restart_V2bX_service_again() {
-    echo "尝试再次重启 V2bX 服务..."
-    systemctl restart V2bX
-    if [ $? -eq 0 ]; then
-        echo "V2bX 服务已成功再次重启。"
-    else
-        echo "V2bX 服务再次重启失败。" >&2
-        exit 1
-    fi
 }
 
 # Step 10: 重启系统
@@ -512,8 +406,6 @@ function main() {
     generate_sing_origin_json
     download_ssl
     open_all_ports
-    restart_v2bx_service
-    install_and_configure_gost
     install_and_enable_bbr
     restart_v2bx_service_again
     reboot_system
