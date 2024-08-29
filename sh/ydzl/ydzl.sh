@@ -11,17 +11,20 @@ function show_menu() {
     echo "==============================="
     echo "         云端智联 保障         "
     echo "==============================="
-    echo -e "${RED}1.${NC}  安装 V2bX"
-    echo -e "${RED}2.${NC}  修改 DNS为CF"
-    echo -e "${RED}3.${NC}  检测 IP优先级"
-    echo -e "${RED}4.${NC}  一键 部署节点"
-    echo -e "${RED}5.${NC}  升级 Debian软件包"
-    echo -e "${RED}6.${NC}  开启 BBR"
-    echo -e "${RED}7.${NC}  检测 IP质量"
-    echo -e "${RED}8.${NC}  安装 EasyGost"
-    echo -e "${RED}9.${NC}  开放 所有端口"
-    echo -e "${RED}10.${NC} 检测 ChatGPT"
-    echo -e "${RED}11.${NC} 管理 WARP"
+    echo -e "${RED}1.${NC}  安装V2bX"
+    echo -e "${RED}2.${NC}  修改DNS为CF"
+    echo -e "${RED}3.${NC}  检测IP优先级"
+    echo -e "${RED}4.${NC}  一键部署节点"
+    echo -e "${RED}5.${NC}  升级Debian软件包"
+    echo -e "${RED}6.${NC}  开启BBR"
+    echo -e "${RED}7.${NC}  检测IP质量"
+    echo -e "${RED}8.${NC}  安装EasyGost"
+    echo -e "${RED}9.${NC}  开放所有端口"
+    echo -e "${RED}10.${NC} ChatGPT检测"
+    echo -e "${RED}11.${NC} 添加WARP网络"
+    echo -e "${RED}12.${NC} IPv4优先"
+    echo -e "${RED}13.${NC} IPv6优先"
+    echo -e "${RED}14.${NC} Linux测速"
     echo "==============================="
     read -p "请输入选项编号: " option
     case $option in
@@ -36,6 +39,9 @@ function show_menu() {
         9) open_ports ;;
         10) chatgpt_menu ;;
         11) warp ;;
+        12) ipv4 ;;
+        13) ipv6 ;;
+        14) Speedtest ;;
         *) echo "无效选项，请重试." && sleep 2 && show_menu ;;
     esac
 }
@@ -87,7 +93,7 @@ function test_ip() {
 # 4. 一键安装节点
 function one_node() {
     echo -e "${GREEN}全自动部署V2bX节点...${NC}"
-    wget -O /root/ydzl_node.sh "https://drive.yd-zl.com/d/local/sh/node/ydzl_node.sh?sign=MY9XXG2fWWLh96d6VuDnf1hLIFmGnHoRyqahXYfAbYE=:0"
+    wget -O /root/ydzl_node.sh "https://raw.githubusercontent.com/yunduanzhilian7/tools/main/sh/node/ydzl_node.sh"
     chmod +x /root/ydzl_node.sh
     bash /root/ydzl_node.sh
     sleep 2
@@ -190,6 +196,27 @@ function chatgpt() {
 #11. 安装/管理 WARP
 function warp() {
     wget -N https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh && bash menu.sh
+    sleep 2
+    show_menu
+}
+
+#12. IPv4优先
+function warp() {
+    sed -i 's/#precedence ::ffff:0:0\/96  100/precedence ::ffff:0:0\/96  100/' /etc/gai.conf
+    sleep 2
+    show_menu
+}
+
+#13. IPv6优先
+function warp() {
+    sed -i 's/precedence ::ffff:0:0\/96  100/#precedence ::ffff:0:0\/96  100/' /etc/gai.conf
+    sleep 2
+    show_menu
+}
+
+#14. Speedtest
+function warp() {
+    bash <(curl -sL bash.icu/speedtest)
     sleep 2
     show_menu
 }
