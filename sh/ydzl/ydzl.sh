@@ -93,7 +93,7 @@ function test_ip() {
 # 4. 一键安装节点
 function one_node() {
     echo -e "${GREEN}全自动部署V2bX节点...${NC}"
-    wget -O /root/ydzl_node.sh "https://raw.githubusercontent.com/yunduanzhilian7/tools/main/sh/node/ydzl_node.sh"
+    wget -O /root/ydzl_node.sh "https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/ydzl_node.sh"
     chmod +x /root/ydzl_node.sh
     bash /root/ydzl_node.sh
     sleep 2
