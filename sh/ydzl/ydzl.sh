@@ -201,21 +201,21 @@ function warp() {
 }
 
 #12. IPv4优先
-function warp() {
+function ipv4() {
     sed -i 's/#precedence ::ffff:0:0\/96  100/precedence ::ffff:0:0\/96  100/' /etc/gai.conf
     sleep 2
     show_menu
 }
 
 #13. IPv6优先
-function warp() {
+function ipv6() {
     sed -i 's/precedence ::ffff:0:0\/96  100/#precedence ::ffff:0:0\/96  100/' /etc/gai.conf
     sleep 2
     show_menu
 }
 
 #14. Speedtest
-function warp() {
+function Speedtest() {
     bash <(curl -sL bash.icu/speedtest)
     sleep 2
     show_menu
