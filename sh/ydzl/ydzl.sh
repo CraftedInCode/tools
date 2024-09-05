@@ -25,6 +25,9 @@ function show_menu() {
     echo -e "${RED}12.${NC} IPv4优先"
     echo -e "${RED}13.${NC} IPv6优先"
     echo -e "${RED}14.${NC} Linux测速"
+    echo -e "${RED}15.${NC} 增减SWAP"
+    echo -e "${RED}16.${NC} 安装3x-ui"
+    echo -e "${RED}17.${NC} Linux测速"
     echo "==============================="
     read -p "请输入选项编号: " option
     case $option in
@@ -42,6 +45,8 @@ function show_menu() {
         12) ipv4 ;;
         13) ipv6 ;;
         14) Speedtest ;;
+        15) swap ;;
+        16) 3x-ui ;;
         *) echo "无效选项，请重试." && sleep 2 && show_menu ;;
     esac
 }
@@ -216,11 +221,59 @@ function ipv6() {
 
 #14. Speedtest
 function Speedtest() {
-    bash <(curl -sL bash.icu/speedtest)
+    bash <(curl -sL https://raw.githubusercontent.com/i-abc/Speedtest/main/speedtest.sh)
+    sleep 2
+    show_menu
+}
+
+#15. swap
+function swap() {
+    echo "请选择操作:"
+    echo "1. 添加交换内存"
+    echo "2. 删除现有交换内存"
+    read -p "请输入选项 [1-2]: " option
+
+    case $option in
+        1)
+            # 添加交换内存
+            read -p "请输入你想要添加的交换内存大小（单位为MB，例如1024）: " swap_size
+            if ! [[ "$swap_size" =~ ^[0-9]+$ ]]; then
+                echo "请输入有效的数字."
+                sleep 2
+                show_menu
+                return
+            fi
+            swap_file="/swapfile"
+            fallocate -l "${swap_size}M" $swap_file
+            chmod 600 $swap_file
+            mkswap $swap_file
+            swapon $swap_file
+            echo "$swap_file none swap sw 0 0" | tee -a /etc/fstab
+            echo "成功添加了 ${swap_size}MB 的交换内存."
+            ;;
+        2)
+            # 删除现有交换内存
+            swap_file="/swapfile"
+            swapoff $swap_file
+            rm -f $swap_file
+            sed -i '/\/swapfile/d' /etc/fstab
+            echo "成功删除了交换内存."
+            ;;
+        *)
+            echo "无效的选项."
+            ;;
+    esac
+
     sleep 2
     show_menu
 }
 
 
+#14. 3x-ui
+function 3x-ui() {
+    bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+    sleep 2
+    show_menu
+}
 # 启动菜单
 show_menu
