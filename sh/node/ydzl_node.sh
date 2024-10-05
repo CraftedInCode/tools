@@ -212,6 +212,8 @@ function generate_sing_origin_json() {
         "domain_keyword": [
           "chatgpt",
           "openai",
+          "disney",
+          "instagram",
           "netflix"
         ],
         "outbound": "warp"
