@@ -8,31 +8,31 @@ NC='\033[0m' # 无颜色
 function Debian_update() {
     echo -e "${GREEN}正在更新 Debian 软件包...${NC}"
     echo -e "${GREEN}更新软件包列表...${NC}"
-    sudo apt update
+    apt update
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}软件包列表更新失败！${NC}"
         exit 1
     fi
     echo -e "${GREEN}升级所有已安装的软件包...${NC}"
-    sudo apt upgrade -y
+    apt upgrade -y
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}软件包升级失败！${NC}"
         exit 1
     fi
     echo -e "${GREEN}进行全面升级...${NC}"
-    sudo apt full-upgrade -y
+    apt full-upgrade -y
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}全面升级失败！${NC}"
         exit 1
     fi
     echo -e "${GREEN}清理不再需要的包...${NC}"
-    sudo apt autoremove -y
+    apt autoremove -y
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}自动清理失败！${NC}"
         exit 1
     fi
     echo -e "${GREEN}安装必要的工具...${NC}"
-    sudo apt install -y iproute2 net-tools
+    apt install -y iproute2 net-tools
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}工具安装失败！${NC}"
         exit 1
@@ -51,7 +51,7 @@ function install_v2bx() {
         exit 1
     fi
     
-    sudo bash install.sh
+    bash install.sh
     if [ $? -ne 0 ];then
         echo -e "${GREEN}V2bX 安装失败！${NC}"
         exit 1
@@ -67,7 +67,7 @@ function update_v2bx_config() {
     read cert_domain_prefix
 
     config_path="/etc/V2bX/config.json"
-    cert_domain_suffix=".ccjz4nmym6qedf3muvprkn6e73rgad3ks3uj1nuocfpn46vyquh2zj070b3uf12.yunduanconnect.com"
+    cert_domain_suffix=".maihaoma.top"
     full_cert_domain="${cert_domain_prefix}${cert_domain_suffix}"
 
     # 更新配置文件
@@ -312,8 +312,8 @@ EOF
 
 function download_ssl() {
     # Step 5: 下载 SSL 证书和密钥
-    CERT_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/yunduanconnect.cer"
-    KEY_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/yunduanconnect.key"
+    CERT_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/node.cer"
+    KEY_URL="https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/update-ssl/node.key"
     DEST_DIR="/etc/V2bX"
     CERT_FILE="$DEST_DIR/fullchain.cer"
     KEY_FILE="$DEST_DIR/cert.key"
