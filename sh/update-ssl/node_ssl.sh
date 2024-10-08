@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 定义下载链接和目标文件路径
-CERT_URL="https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.cer?sign=K16M1sTDB_788M3YDJ--6URCtj3PH_VBFrk_AAsHT0M=:0"
-KEY_URL="https://drive.yd-zl.com/d/local/sh/update-ssl/yunduanconnect.key?sign=ro1_Gb7iwWo-uwsf5jbehti78xi5B8-LVQ2Lh74NioM=:0"
+CERT_URL="https://github.com/CraftedInCode/tools/blob/main/sh/update-ssl/node.crt"
+KEY_URL="https://github.com/CraftedInCode/tools/blob/main/sh/update-ssl/node.key"
 DEST_DIR="/etc/V2bX"
 CERT_FILE="$DEST_DIR/fullchain.cer"
 KEY_FILE="$DEST_DIR/cert.key"
