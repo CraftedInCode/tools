@@ -1,7 +1,7 @@
 #更新节点证书
 
-curl -sSL "https://drive.yd-zl.com/d/local/sh/update-ssl/node_ssl.sh?sign=0zKMH2fHVAHINyOwV6Zj8Vvvs4KuOuAlykdkRrWdbFE=:0" -o /etc/V2bX/node_ssl.sh
-bash /etc/V2bX/node_ssl.sh
+curl -sSL "https://github.com/CraftedInCode/tools/blob/main/sh/update-ssl/node_ssl.sh" -o /root/node_ssl.sh
+bash /root/node_ssl.sh
 
 #添加定时任务
 
