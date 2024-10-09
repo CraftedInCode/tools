@@ -1,49 +1,30 @@
 #!/bin/bash
 
+# 检查是否以 root 权限运行
+if [[ $EUID -ne 0 ]]; then
+   echo "请使用 sudo 或 root 权限运行该脚本。" 
+   exit 1
+fi
+
 # 定义颜色变量
 GREEN='\033[0;32m'
 NC='\033[0m' # 无颜色
 
+# 配置路径
+config_path="/etc/V2bX/config.json"
+
 # 更新 Debian 软件包和安装必要工具
 function Debian_update() {
     echo -e "${GREEN}正在更新 Debian 软件包...${NC}"
-    echo -e "${GREEN}更新软件包列表...${NC}"
-    apt update
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}软件包列表更新失败！${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}升级所有已安装的软件包...${NC}"
-    apt upgrade -y
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}软件包升级失败！${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}进行全面升级...${NC}"
-    apt full-upgrade -y
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}全面升级失败！${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}清理不再需要的包...${NC}"
+    apt update && apt upgrade -y && apt full-upgrade -y
     apt autoremove -y
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}自动清理失败！${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}安装必要的工具...${NC}"
     apt install -y iproute2 net-tools
-    if [ $? -ne 0 ]; then
-        echo -e "${GREEN}工具安装失败！${NC}"
-        exit 1
-    fi
     echo -e "${GREEN}软件包和工具安装完成！${NC}"
 }
 
-
 # 下载并安装 V2bX
 function install_v2bx() {
-    echo -e "${GREEN}下载并安装 V2bX...${NC}"
+    echo -e "${GREEN}下载并安装 V2BX...${NC}"
     
     wget -N https://raw.githubusercontent.com/wyx2685/V2bX-script/master/install.sh
     if [ $? -ne 0 ]; then
@@ -52,19 +33,18 @@ function install_v2bx() {
     fi
     
     bash install.sh
-    if [ $? -ne 0 ];then
+    if [ $? -ne 0 ]; then
         echo -e "${GREEN}V2bX 安装失败！${NC}"
         exit 1
     fi
     echo -e "${GREEN}V2bX 下载和安装成功！${NC}"
 }
 
-#生成/etc/V2bX/config.json
+# 生成 /etc/V2bX/config.json
 function update_v2bx_config() {
     echo -e "${GREEN}请输入 NodeID:${NC}"
     read node_id
 
-    # 更新配置文件
     cat > $config_path <<EOL
 {
     "Log": {
@@ -118,17 +98,13 @@ EOL
     echo -e "${GREEN}配置文件已成功更新${NC}"
 }
 
-
 # 生成 Singbox 配置文件
 function generate_sing_origin_json() {
-    # 备份现有的 sing_origin.json 文件
     cp /etc/V2bX/sing_origin.json /etc/V2bX/sing_origin.json.bak
 
-    # 读取 PrivateKey 和 Reserved 值
     private_key=$(grep '^PrivateKey' /etc/wireguard/warp.conf | awk -F '= ' '{print $2}')
     reserved=$(grep '^#Reserved' /etc/wireguard/warp.conf | awk -F '= ' '{print $2}' | tr -d '[]')
 
-    # 生成新的 sing_origin.json 文件
     cat <<EOF > /etc/V2bX/sing_origin.json
 {
   "dns": {
@@ -296,117 +272,41 @@ function generate_sing_origin_json() {
 }
 EOF
 
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Singbox 配置文件生成成功。${NC}"
-    else
-        echo -e "${RED}生成 Singbox 配置文件失败。${NC}"
-        exit 1
-    fi
+    echo -e "${GREEN}Singbox 配置文件生成成功！${NC}"
 }
 
-function download_ssl() {
-    # Step 5: 下载 SSL 证书和密钥
-    CERT_URL="https://github.com/CraftedInCode/tools/blob/main/sh/node/fullchain.cer"
-    KEY_URL="https://github.com/CraftedInCode/tools/blob/main/sh/node/cert.key"
-    DEST_DIR="/etc/V2bX"
-    CERT_FILE="$DEST_DIR/fullchain.cer"
-    KEY_FILE="$DEST_DIR/cert.key"
+# 下载证书和密钥
+function download_certificates() {
+    echo -e "${GREEN}正在下载证书和密钥...${NC}"
+    
+    wget -O /etc/V2bX/fullchain.cer https://raw.githubusercontent.com/your/repo/path/to/fullchain.cer
+    wget -O /etc/V2bX/cert.key https://raw.githubusercontent.com/your/repo/path/to/cert.key
 
-    # 删除旧的证书和密钥文件
-    echo "正在删除旧的证书和密钥文件..."
-    rm -f "$CERT_FILE"
-    rm -f "$KEY_FILE"
-    if [ $? -eq 0 ]; then
-        echo "旧的证书和密钥文件删除成功。"
-    else
-        echo "删除旧的证书和密钥文件失败。" >&2
+    if [ $? -ne 0 ]; then
+        echo -e "${GREEN}下载证书和密钥失败！${NC}"
         exit 1
     fi
 
-    # 下载新的证书和密钥
-    echo "正在下载新的证书..."
-    wget -O "$CERT_FILE" "$CERT_URL"
-    if [ $? -eq 0 ];then
-        echo "证书下载成功，已保存到 $CERT_FILE。"
-    else
-        echo "证书下载失败。" >&2
-        exit 1
-    fi
-
-    echo "正在下载新的密钥..."
-    wget -O "$KEY_FILE" "$KEY_URL"
-    if [ $? -eq 0 ]; then
-        echo "密钥下载成功，已保存到 $KEY_FILE。"
-    else
-        echo "密钥下载失败。" >&2
-        exit 1
-    fi
-
-    echo -e "${GREEN}证书和密钥下载并配置完成。${NC}"
+    echo -e "${GREEN}证书和密钥下载成功！${NC}"
 }
 
-
-# Step 6: 开放所有端口
-function open_all_ports() {
-    echo "正在开放所有端口..."
-    systemctl stop firewalld.service 2>/dev/null
-    systemctl disable firewalld.service 2>/dev/null
-    setenforce 0 2>/dev/null
-    ufw disable 2>/dev/null
-    iptables -P INPUT ACCEPT 2>/dev/null
-    iptables -P FORWARD ACCEPT 2>/dev/null
-    iptables -P OUTPUT ACCEPT 2>/dev/null
-    iptables -t nat -F 2>/dev/null
-    iptables -t mangle -F 2>/dev/null
-    iptables -F 2>/dev/null
-    iptables -X 2>/dev/null
-    netfilter-persistent save 2>/dev/null
-    echo -e "${GREEN}所有端口已开放。${NC}"
-}
-
-# Step 7: 重启 V2bX 服务
-function restart_V2bX_service() {
-    echo "尝试重启 V2bX 服务..."
+# 重启 V2bX 服务
+function restart_v2bx() {
+    echo -e "${GREEN}正在重启 V2bX 服务...${NC}"
     V2bX restart
     if [ $? -eq 0 ]; then
-        echo "V2bX 服务已成功重启。"
+        echo -e "${GREEN}V2bX 服务重启成功！${NC}"
     else
-        echo "V2bX 服务重启失败。" >&2
-        exit 1
+        echo -e "${GREEN}V2bX 服务重启失败！${NC}"
     fi
 }
 
-# Step 8: 安装并启用 BBR
-function install_and_enable_bbr() {
-    echo "正在安装证书工具和下载 BBR 脚本..."
-    apt-get install ca-certificates wget -y
-    update-ca-certificates
-    wget -O tcpx.sh "https://github.com/ylx2016/Linux-NetSpeed/raw/master/tcpx.sh"
-    chmod +x tcpx.sh
-    ./tcpx.sh
+# 执行脚本的主要流程
+Debian_update
+install_v2bx
+update_v2bx_config
+generate_sing_origin_json
+download_certificates
+restart_v2bx
 
-    echo -e "${GREEN}BBR 已配置完成。${NC}"
-}
-
-# Step 10: 重启系统
-function reboot_system() {
-    echo -e "${GREEN}所有步骤完成，系统即将重启...${NC}"
-    reboot
-}
-
-# 主函数调用所有步骤
-function main() {
-    Debian_update
-    install_v2bx
-    update_v2bx_config
-    generate_sing_origin_json
-    download_ssl
-    open_all_ports
-    install_and_enable_bbr
-    restart_v2bx_service_again
-    reboot_system
-}
-
-
-# 执行主函数
-main
+echo -e "${GREEN}所有操作已完成！${NC}"
