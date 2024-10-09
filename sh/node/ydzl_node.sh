@@ -63,12 +63,6 @@ function install_v2bx() {
 function update_v2bx_config() {
     echo -e "${GREEN}请输入 NodeID:${NC}"
     read node_id
-    echo -e "${GREEN}请输入 CertDomain 的前缀 (例如: hk1):${NC}"
-    read cert_domain_prefix
-
-    config_path="/etc/V2bX/config.json"
-    cert_domain_suffix=".ccjz4nmym6qedf3muvprkn6e73rgad3ks3uj1nuocfpn46vyquh2zj070b3uf12.yunduanconnect.com"
-    full_cert_domain="${cert_domain_prefix}${cert_domain_suffix}"
 
     # 更新配置文件
     cat > $config_path <<EOL
@@ -108,7 +102,7 @@ function update_v2bx_config() {
         "CertConfig": {
             "CertMode": "self",
             "RejectUnknownSni": false,
-            "CertDomain": "$full_cert_domain",
+            "CertDomain": "0.yunduanconnect.com",
             "CertFile": "/etc/V2bX/fullchain.cer",
             "KeyFile": "/etc/V2bX/cert.key",
             "Email": "v2bx@github.com",
@@ -373,7 +367,7 @@ function open_all_ports() {
 # Step 7: 重启 V2bX 服务
 function restart_V2bX_service() {
     echo "尝试重启 V2bX 服务..."
-    systemctl restart V2bX
+    V2bX restart
     if [ $? -eq 0 ]; then
         echo "V2bX 服务已成功重启。"
     else
