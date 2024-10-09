@@ -1,3 +1,12 @@
-wget -O /root/ydzl_node.sh "https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/ydzl_node.sh"
-chmod +x /root/ydzl_node.sh
-bash /root/ydzl_node.sh
+##一键节点配置
+wget -O /root/ydzl_node.sh https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/ydzl_node.sh && \
+chmod +x /root/ydzl_node.sh && \
+/root/ydzl_node.sh
+
+
+
+##证书更新
+wget -O /root/update_cert.sh https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/update_cert.sh && \
+chmod +x /root/update_cert.sh && \
+/root/update_cert.sh && \
+(crontab -l; echo "0 0 */15 * * /root/update_cert.sh") | crontab -
