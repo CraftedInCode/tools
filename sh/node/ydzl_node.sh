@@ -312,8 +312,8 @@ EOF
 
 function download_ssl() {
     # Step 5: 下载 SSL 证书和密钥
-    CERT_URL="https://github.com/CraftedInCode/tools/blob/main/sh/update-ssl/fullchain.cer"
-    KEY_URL="https://github.com/CraftedInCode/tools/blob/main/sh/update-ssl/cert.key"
+    CERT_URL="https://github.com/CraftedInCode/tools/blob/main/sh/node/fullchain.cer"
+    KEY_URL="https://github.com/CraftedInCode/tools/blob/main/sh/node/cert.key"
     DEST_DIR="/etc/V2bX"
     CERT_FILE="$DEST_DIR/fullchain.cer"
     KEY_FILE="$DEST_DIR/cert.key"
