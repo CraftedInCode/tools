@@ -279,8 +279,8 @@ EOF
 function download_certificates() {
     echo -e "${GREEN}正在下载证书和密钥...${NC}"
     
-    wget -O /etc/V2bX/fullchain.cer https://raw.githubusercontent.com/your/repo/path/to/fullchain.cer
-    wget -O /etc/V2bX/cert.key https://raw.githubusercontent.com/your/repo/path/to/cert.key
+    wget -O /etc/V2bX/fullchain.cer https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/fullchain.cer
+    wget -O /etc/V2bX/cert.key https://raw.githubusercontent.com/CraftedInCode/tools/main/sh/node/cert.key
 
     if [ $? -ne 0 ]; then
         echo -e "${GREEN}下载证书和密钥失败！${NC}"
