@@ -102,9 +102,6 @@ EOL
 function generate_sing_origin_json() {
     cp /etc/V2bX/sing_origin.json /etc/V2bX/sing_origin.json.bak
 
-    private_key=$(grep '^PrivateKey' /etc/wireguard/warp.conf | awk -F '= ' '{print $2}')
-    reserved=$(grep '^#Reserved' /etc/wireguard/warp.conf | awk -F '= ' '{print $2}' | tr -d '[]')
-
     cat <<EOF > /etc/V2bX/sing_origin.json
 {
   "dns": {
@@ -142,15 +139,14 @@ function generate_sing_origin_json() {
       "tag": "block"
     },
     {
-      "type": "wireguard",
-      "tag": "warp",
-      "server": "engage.cloudflareclient.com",
-      "server_port": 2408,
-      "local_address": ["172.16.0.2/32"],
-      "private_key": "$private_key",
-      "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=",
-      "reserved": [$reserved],
-      "mtu": 1420
+      "type": "socks",
+      "tag": "socks",
+      "server": "127.0.0.1",
+      "server_port": 40000,
+      "version": "5",
+      "username": "",
+      "password": "",
+      "network": "tcp"
     }
   ],
   "route": {
@@ -176,17 +172,22 @@ function generate_sing_origin_json() {
           "geosite-cn",
           "geoip-cn"
         ],
-        "outbound": "warp"
+        "outbound": "socks"
       },
       {
         "domain_keyword": [
           "chatgpt",
           "openai",
-          "disney",
-          "instagram",
+          "disneyplus",
+          "spotify",
+          "dmm",
+          "abema",
+          "telasa",
+          "binge",
+          "kayosports",
           "netflix"
         ],
-        "outbound": "warp"
+        "outbound": "socks"
       },
       {
         "domain_keyword": [
